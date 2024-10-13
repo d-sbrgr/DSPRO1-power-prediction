@@ -1,8 +1,27 @@
+import os
+from pathlib import Path
 import pandas as pd
 import matplotlib.pyplot as plt
 
 
-def convert_date(df):
+def get_project_root() -> Path:
+    """Returns the root directory of the project."""
+    try:
+        project_root = Path(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    except NameError:
+        project_root = Path().resolve()
+    return project_root
+
+
+def read_input() -> pd.DataFrame:
+    """Reads the input data from the input file."""
+    project_root = get_project_root()
+    file_path = project_root / 'data' / 'formatted_source_data.csv'
+    return pd.read_csv(file_path)
+
+
+def convert_date(df) -> None:
+    """Converts the date column to datetime format and adds the features Year, Month, Day, Hour and Weekday."""
     df['Date_format'] = pd.to_datetime(df['Date'])
     df['Year'] = df['Date_format'].dt.year
     df['Month'] = df['Date_format'].dt.month
@@ -11,77 +30,141 @@ def convert_date(df):
     df['Weekday'] = df['Date_format'].dt.weekday + 1
     pass
 
-
-def combine_power_consumption(df):
-    df['Power_consumption'] = df['Value_NE5'] + df['Value_NE7']
-
-
-def fill_nan_values(df):
-    columns = ['Hr [%Hr]', 'T [°C]', 'WD [°]', 'WVs [m/s]', 'WVv [m/s]', 'p [hPa]', 'RainDur [min]', 'StrGlo [W/m2]']
-    for column in columns:
-        nan_rows = df[df[[column]].isna().any(axis=1)]
-        mean_values = (df.groupby(['Month', 'Day', 'Hour'])[column].mean().to_dict())
-
-        for index, row in nan_rows.iterrows():
-            month = row['Month']
-            day = row['Day']
-            hour = row['Hour']
-            value = mean_values.get((month, day, hour))
-            df.at[index, column] = value
+def combine_power_consumption(df) -> None:
+    """Combines the power consumption columns."""
+    df['NE_tot'] = df['Value_NE5'] + df['Value_NE7']
     pass
 
+def clean_time_sync(df) -> pd.DataFrame:
+    """Removes the last rows."""
+    df_time = df.drop(df.index[85512:85525])
+    return df_time
 
-def print_ranges(df):
-    print(f'Min/Max value for NE5 = {df['Value_NE5'].min()}, {df['Value_NE5'].max()} in kWh')
-    print(f'Min/Max value for NE7 = {df['Value_NE7'].min()}, {df['Value_NE7'].max()} in kWh')
-    print(f'Min/Max value for humidity = {df['Hr [%Hr]'].min()}, {df['Hr [%Hr]'].max()} in %')
-    print(f'Min/Max value for rain duration = {df['RainDur [min]'].min()}, {df['RainDur [min]'].max()} in min')
-    print(f'Min/Max value for global radiation = {df['StrGlo [W/m2]'].min()}, {df['StrGlo [W/m2]'].max()} in W/m2')
-    print(f'Min/Max value for temperature = {df['T [°C]'].min()}, {df['T [°C]'].max()} in °C')
-    print(f'Min/Max value for wind direction = {df['WD [°]'].min()}, {df['WD [°]'].max()} in °')
-    print(f'Min/Max value for wind speed = {df['WVs [m/s]'].min()}, {df['WVs [m/s]'].max()} in m/s')
-    print(f'Min/Max value for wind speed = {df['WVv [m/s]'].min()}, {df['WVv [m/s]'].max()} in m/s')
-    print(f'Min/Max value for air pressure = {df['p [hPa]'].min()}, {df['p [hPa]'].max()} in hPa')
+def clean_humidity(df) -> None:
+    """Cleans the humidity column."""
+    df.loc[df['Hr [%Hr]'] > 100, 'Hr [%Hr]'] = 100
     pass
 
+def add_corona_feature(df) -> None:
+    """Adds the corona feature."""
+    corona_period_1 = (df['Date_format'] >= '2020-03-18') & (df['Date_format'] <= '2020-06-06')
+    corona_period_2 = (df['Date_format'] >= '2021-01-18') & (df['Date_format'] <= '2021-03-04')
+    df['Corona'] = (corona_period_1 | corona_period_2).astype(int)
+    pass
 
-def plot_data(df):
+def plot_data(df) -> None:
+    """Plots the data on the plot."""
     fig, axes = plt.subplots(3, 4, figsize=(15, 10))
-    columns = ['Value_NE5', 'Value_NE7', 'Hr [%Hr]', 'RainDur [min]', 'StrGlo [W/m2]', 'T [°C]', 'WD [°]', 'WVs [m/s]',
-               'WVv [m/s]', 'p [hPa]', 'Vacation', 'Power_consumption']
-    for i, column in enumerate(columns):
-        if column in df.columns:
-            row = i // 4
-            col = i % 4
-            df[column].plot(ax=axes[row, col], title=column)
+    cols = ['Value_NE5', 'Value_NE7', 'Hr [%Hr]', 'RainDur [min]', 'StrGlo [W/m2]', 'T [°C]', 'WD [°]', 'WVs [m/s]',
+            'WVv [m/s]', 'p [hPa]', 'NE_tot']
+    for i, col in enumerate(cols):
+        if col in df.columns:
+            row_plot = i // 4
+            col_plot = i % 4
+            df[col].plot(ax=axes[row_plot, col_plot], title=col)
 
     plt.tight_layout()
     plt.show()
     pass
 
-
-def clean_invalid_values(df):
-    df = df.drop(df[df['Value_NE7'] < 100000].index)
-    df = df.drop(df[df['Year'] == 2014].index)
-    df.loc[df['Hr [%Hr]'] > 100, 'Hr [%Hr]'] = 100
+def clean_typ(df) -> pd.DataFrame:
+    """Set the features Vacation, Holiday, Year, Month, Day, Hour, Weekday and Corona as categorical typ."""
+    df['Vacation'] = df['Vacation'].astype('category')
+    df['Holiday'] = df['Holiday'].astype('category')
+    df['Year'] = df['Year'].astype('category')
+    df['Month'] = df['Month'].astype('category')
+    df['Day'] = df['Day'].astype('category')
+    df['Hour'] = df['Hour'].astype('category')
+    df['Weekday'] = df['Weekday'].astype('category')
+    df['Corona'] = df['Corona'].astype('category')
     return df
 
+def data_cleaning_strategy_1(df) -> pd.DataFrame:
+    """NaN values are retained, and the implausible data are overwritten with NaN values."""
+    df_strategy_1 = df.copy()
+    df_strategy_1.loc[df_strategy_1['Value_NE5'] < 60000, 'Value_NE5'] = None
+    df_strategy_1.loc[df_strategy_1['Value_NE7'] < 100000, 'Value_NE7'] = None
+    combine_power_consumption(df_strategy_1)
+    return df_strategy_1
 
-df = pd.read_csv('../data/formatted_source_data.csv')
-print(df.columns)
+def data_cleaning_strategy_2(df) -> pd.DataFrame:
+    """Removes NaN values as well as the implausible values."""
+    df_strategy_2 = df.copy()
+    df_strategy_2 = df_strategy_2.dropna()
+    df_strategy_2 = df_strategy_2.drop(df_strategy_2[df_strategy_2['Value_NE5'] < 60000].index)
+    df_strategy_2 = df_strategy_2.drop(df_strategy_2[df_strategy_2['Value_NE7'] < 100000].index)
+    combine_power_consumption(df_strategy_2)
+    df_strategy_2.reset_index(drop=True, inplace=True)
+    return df_strategy_2
 
-convert_date(df)
-combine_power_consumption(df)
-print('Are any duplicates', df.duplicated().any())
-print(df.isna().any())
-print_ranges(df)
-print('------------------------------------------------------------')
-fill_nan_values(df)
-df = clean_invalid_values(df)
-print(df.isna().any())
-print_ranges(df)
-grouped_df = df.groupby('Year')['Power_consumption'].sum().reset_index()
-grouped_df['Power_consumption'] = grouped_df['Power_consumption'] / 1000000000
-print(grouped_df)
+def data_cleaning_strategy_3(df) -> pd.DataFrame:
+    """NaN values as well as the implausible values are replaced by the mean. The mean is calculated from the values
+    where the Month, Day, and Hour are identical."""
+    df_strategy_3 = df.copy()
+    columns = ['Value_NE5','Value_NE7', 'Hr [%Hr]', 'T [°C]', 'WD [°]', 'WVs [m/s]', 'WVv [m/s]', 'p [hPa]',
+               'RainDur [min]', 'StrGlo [W/m2]']
 
-plot_data(df)
+    for column in columns:
+        nan_rows = df_strategy_3[df_strategy_3[[column]].isna().any(axis=1)]
+        mean_values = (df_strategy_3.groupby(['Month', 'Day', 'Hour'], observed=False)[column].mean().to_dict())
+        for index, row in nan_rows.iterrows():
+            month = row['Month']
+            day = row['Day']
+            hour = row['Hour']
+            value = mean_values.get((month, day, hour))
+            df_strategy_3.at[index, column] = value
+
+    mask = df_strategy_3['Value_NE5'] < 60000
+    mean_values = df_strategy_3.groupby(['Month', 'Day', 'Hour'], observed=False)['Value_NE5'].mean().to_dict()
+    for index, row in df_strategy_3[mask].iterrows():
+        month = row['Month']
+        day = row['Day']
+        hour = row['Hour']
+        value = mean_values.get((month, day, hour))
+        if value is not None:
+            df_strategy_3.at[index, 'Value_NE5'] = value
+
+    mask = df_strategy_3['Value_NE7'] < 100000
+    mean_values = df_strategy_3.groupby(['Month', 'Day', 'Hour'], observed=False)['Value_NE7'].mean().to_dict()
+    for index, row in df_strategy_3[mask].iterrows():
+        month = row['Month']
+        day = row['Day']
+        hour = row['Hour']
+        value = mean_values.get((month, day, hour))
+        if value is not None:
+            df_strategy_3.at[index, 'Value_NE7'] = value
+    combine_power_consumption(df_strategy_3)
+    return df_strategy_3
+
+def get_cleaned_strategy_1() -> pd.DataFrame:
+    """Returns the DataFrame with the cleaning strategy 1."""
+    df = read_input()
+    convert_date(df)
+    combine_power_consumption(df)
+    df_time = clean_time_sync(df)
+    clean_humidity(df_time)
+    add_corona_feature(df_time)
+    df_type = clean_typ(df_time)
+    return data_cleaning_strategy_1(df_type)
+
+def get_cleaned_strategy_2() -> pd.DataFrame:
+    """Returns the DataFrame with the cleaning strategy 2."""
+    df = read_input()
+    convert_date(df)
+    combine_power_consumption(df)
+    df_time = clean_time_sync(df)
+    clean_humidity(df_time)
+    add_corona_feature(df_time)
+    df_type = clean_typ(df_time)
+    return data_cleaning_strategy_2(df_type)
+
+def get_cleaned_strategy_3() -> pd.DataFrame:
+    """Returns the DataFrame with the cleaning strategy 3."""
+    df = read_input()
+    convert_date(df)
+    combine_power_consumption(df)
+    df_time = clean_time_sync(df)
+    clean_humidity(df_time)
+    add_corona_feature(df_time)
+    df_type = clean_typ(df_time)
+    return data_cleaning_strategy_3(df_type)
