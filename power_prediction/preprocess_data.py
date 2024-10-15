@@ -1,4 +1,3 @@
-import os
 from pathlib import Path
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -7,7 +6,7 @@ import matplotlib.pyplot as plt
 def get_project_root() -> Path:
     """Returns the root directory of the project."""
     try:
-        project_root = Path(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        project_root = Path(__file__).parent.parent
     except NameError:
         project_root = Path().resolve()
     return project_root
@@ -28,29 +27,26 @@ def convert_date(df) -> None:
     df['Day'] = df['Date_format'].dt.day
     df['Hour'] = df['Date_format'].dt.hour
     df['Weekday'] = df['Date_format'].dt.weekday + 1
-    pass
 
 def combine_power_consumption(df) -> None:
     """Combines the power consumption columns."""
     df['NE_tot'] = df['Value_NE5'] + df['Value_NE7']
-    pass
 
 def clean_time_sync(df) -> pd.DataFrame:
-    """Removes the last rows."""
-    df_time = df.drop(df.index[85512:85525])
+    """Removes the last rows with NaN values."""
+    idx_drop = df[(df["NE_tot"].isna()) & (df["Date_format"] >= pd.to_datetime("2024-10-02").tz_localize('UTC'))].index
+    df_time = df.drop(idx_drop)
     return df_time
 
 def clean_humidity(df) -> None:
     """Cleans the humidity column."""
     df.loc[df['Hr [%Hr]'] > 100, 'Hr [%Hr]'] = 100
-    pass
 
 def add_corona_feature(df) -> None:
     """Adds the corona feature."""
     corona_period_1 = (df['Date_format'] >= '2020-03-18') & (df['Date_format'] <= '2020-06-06')
     corona_period_2 = (df['Date_format'] >= '2021-01-18') & (df['Date_format'] <= '2021-03-04')
     df['Corona'] = (corona_period_1 | corona_period_2).astype(int)
-    pass
 
 def plot_data(df) -> None:
     """Plots the data on the plot."""
@@ -65,7 +61,6 @@ def plot_data(df) -> None:
 
     plt.tight_layout()
     plt.show()
-    pass
 
 def clean_typ(df) -> pd.DataFrame:
     """Set the features Vacation, Holiday, Year, Month, Day, Hour, Weekday and Corona as categorical typ."""
