@@ -2,21 +2,13 @@ from pathlib import Path
 import pandas as pd
 import matplotlib.pyplot as plt
 
-
-def get_project_root() -> Path:
-    """Returns the root directory of the project."""
-    try:
-        project_root = Path(__file__).parent.parent
-    except NameError:
-        project_root = Path().resolve()
-    return project_root
+from . import get_project_root
 
 
 def read_input() -> pd.DataFrame:
     """Reads the input data from the input file."""
-    project_root = get_project_root()
-    file_path = project_root / 'data' / 'formatted_source_data.csv'
-    return pd.read_csv(file_path)
+    file_path = get_project_root() / 'data' / 'formatted_source_data.csv'
+    return pd.read_csv(file_path, index_col=0)
 
 
 def convert_date(df) -> None:
@@ -74,7 +66,7 @@ def clean_typ(df) -> pd.DataFrame:
     df['Corona'] = df['Corona'].astype('category')
     return df
 
-def data_cleaning_strategy_1(df) -> pd.DataFrame:
+def clean_retain_nan(df) -> pd.DataFrame:
     """NaN values are retained, and the implausible data are overwritten with NaN values."""
     df_strategy_1 = df.copy()
     df_strategy_1.loc[df_strategy_1['Value_NE5'] < 60000, 'Value_NE5'] = None
@@ -82,7 +74,7 @@ def data_cleaning_strategy_1(df) -> pd.DataFrame:
     combine_power_consumption(df_strategy_1)
     return df_strategy_1
 
-def data_cleaning_strategy_2(df) -> pd.DataFrame:
+def clean_remove_nan(df) -> pd.DataFrame:
     """Removes NaN values as well as the implausible values."""
     df_strategy_2 = df.copy()
     df_strategy_2 = df_strategy_2.dropna()
@@ -92,7 +84,7 @@ def data_cleaning_strategy_2(df) -> pd.DataFrame:
     df_strategy_2.reset_index(drop=True, inplace=True)
     return df_strategy_2
 
-def data_cleaning_strategy_3(df) -> pd.DataFrame:
+def clean_interpolate_nan(df) -> pd.DataFrame:
     """NaN values as well as the implausible values are replaced by the mean. The mean is calculated from the values
     where the Month, Day, and Hour are identical."""
     df_strategy_3 = df.copy()
@@ -131,7 +123,7 @@ def data_cleaning_strategy_3(df) -> pd.DataFrame:
     combine_power_consumption(df_strategy_3)
     return df_strategy_3
 
-def get_cleaned_strategy_1() -> pd.DataFrame:
+def get_data_retain_nan() -> pd.DataFrame:
     """Returns the DataFrame with the cleaning strategy 1."""
     df = read_input()
     convert_date(df)
@@ -140,9 +132,9 @@ def get_cleaned_strategy_1() -> pd.DataFrame:
     clean_humidity(df_time)
     add_corona_feature(df_time)
     df_type = clean_typ(df_time)
-    return data_cleaning_strategy_1(df_type)
+    return clean_retain_nan(df_type)
 
-def get_cleaned_strategy_2() -> pd.DataFrame:
+def get_data_remove_nan() -> pd.DataFrame:
     """Returns the DataFrame with the cleaning strategy 2."""
     df = read_input()
     convert_date(df)
@@ -151,9 +143,9 @@ def get_cleaned_strategy_2() -> pd.DataFrame:
     clean_humidity(df_time)
     add_corona_feature(df_time)
     df_type = clean_typ(df_time)
-    return data_cleaning_strategy_2(df_type)
+    return clean_remove_nan(df_type)
 
-def get_cleaned_strategy_3() -> pd.DataFrame:
+def get_data_interpolate_nan() -> pd.DataFrame:
     """Returns the DataFrame with the cleaning strategy 3."""
     df = read_input()
     convert_date(df)
@@ -162,4 +154,4 @@ def get_cleaned_strategy_3() -> pd.DataFrame:
     clean_humidity(df_time)
     add_corona_feature(df_time)
     df_type = clean_typ(df_time)
-    return data_cleaning_strategy_3(df_type)
+    return clean_interpolate_nan(df_type)
