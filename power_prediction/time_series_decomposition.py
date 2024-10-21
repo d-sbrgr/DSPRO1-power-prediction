@@ -2,12 +2,16 @@ import pandas as pd
 from prophet import Prophet
 
 
-def df_to_prophet(df: pd.DataFrame, key: str):
+def df_time_to_utc_plus_one(df: pd.DataFrame) -> pd.DataFrame:
     df = df.copy()
     df["Date"] = pd.to_datetime(df["Date"])
     df.set_index("Date", inplace=True)
     df = df.tz_convert("+0100").tz_localize(None)
     df.reset_index(inplace=True)
+    return df
+
+
+def df_to_prophet(df: pd.DataFrame, key: str) -> pd.DataFrame:
     return pd.DataFrame({"ds": df["Date"], "y": df[key]})
 
 
