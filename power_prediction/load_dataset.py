@@ -24,8 +24,15 @@ def load_data_default_interpolate_nan() -> pd.DataFrame:
 
 def load_data_residuals_remove_nan() -> pd.DataFrame:
     data = _load_residuals_data()
+    data["Date"] = pd.to_datetime(data["Date"])
     data.dropna(inplace=True)
     return data
 
 def load_data_residuals_retain_nan() -> pd.DataFrame:
     return _load_residuals_data()
+
+def resample_hourly_to_daily(df: pd.DataFrame, sum_cols: list, avg_cols: list, first_cols: list) -> pd.DataFrame:
+    df_sum = df[sum_cols].resample('D').sum()
+    df_avg = df[avg_cols].resample('D').mean()
+    df_first = df[first_cols].resample('D').first()
+    return pd.concat([df_sum, df_avg, df_first], axis=1)
