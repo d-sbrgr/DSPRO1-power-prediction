@@ -1,0 +1,14 @@
+aliases: []
+creation_timestamp: 1731620322219
+current_stage: None
+description: null
+last_updated_timestamp: 1731620322219
+name: linear
+run_id: 60528c123aa9418fa7ba8cb826a01ded
+run_link: null
+source: file:C:\Users\michi\PycharmProjects\DSPRO1-power-prediction/Models/mlruns/0/60528c123aa9418fa7ba8cb826a01ded/artifacts/model
+status: READY
+status_message: null
+storage_location: file:C:\Users\michi\PycharmProjects\DSPRO1-power-prediction/Models/mlruns/0/60528c123aa9418fa7ba8cb826a01ded/artifacts/model
+user_id: null
+version: 2
