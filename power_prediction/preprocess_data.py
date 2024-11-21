@@ -5,10 +5,34 @@ import matplotlib.pyplot as plt
 from . import get_project_root
 
 
-def read_input() -> pd.DataFrame:
+def read_formatted_source_data() -> pd.DataFrame:
     """Reads the input data from the input file."""
-    file_path = get_project_root() / 'data' / 'formatted_source_data.csv'
-    return pd.read_csv(file_path, index_col=0)
+    file_path = get_project_root() / 'data' / 'formatted_source_data.parquet'
+    return pd.read_parquet(file_path, engine='pyarrow')
+
+
+def read_cleaned_data_retain_nan() -> pd.DataFrame:
+    """Reads the input data from the input file."""
+    file_path = get_project_root() / 'data' / 'cleaned_strategy_1.parquet'
+    return pd.read_parquet(file_path, engine='pyarrow')
+
+
+def read_cleaned_data_remove_nan() -> pd.DataFrame:
+    """Reads the input data from the input file."""
+    file_path = get_project_root() / 'data' / 'cleaned_strategy_2.parquet'
+    return pd.read_parquet(file_path, engine='pyarrow')
+
+
+def read_cleaned_data_interpolate_nan() -> pd.DataFrame:
+    """Reads the input data from the input file."""
+    file_path = get_project_root() / 'data' / 'cleaned_strategy_3.parquet'
+    return pd.read_parquet(file_path, engine='pyarrow')
+
+
+def read_time_decomposition_remainder_data() -> pd.DataFrame:
+    """Reads the input data from the input file."""
+    file_path = get_project_root() / 'data' / 'time_decomposition_remainder_data.parquet'
+    return pd.read_parquet(file_path, engine='pyarrow')
 
 
 def convert_date(df) -> None:
@@ -125,7 +149,7 @@ def clean_interpolate_nan(df) -> pd.DataFrame:
 
 def get_data_retain_nan() -> pd.DataFrame:
     """Returns the DataFrame with the cleaning strategy 1."""
-    df = read_input()
+    df = read_formatted_source_data()
     convert_date(df)
     combine_power_consumption(df)
     df_time = clean_time_sync(df)
@@ -136,7 +160,7 @@ def get_data_retain_nan() -> pd.DataFrame:
 
 def get_data_remove_nan() -> pd.DataFrame:
     """Returns the DataFrame with the cleaning strategy 2."""
-    df = read_input()
+    df = read_formatted_source_data()
     convert_date(df)
     combine_power_consumption(df)
     df_time = clean_time_sync(df)
@@ -147,7 +171,7 @@ def get_data_remove_nan() -> pd.DataFrame:
 
 def get_data_interpolate_nan() -> pd.DataFrame:
     """Returns the DataFrame with the cleaning strategy 3."""
-    df = read_input()
+    df = read_formatted_source_data()
     convert_date(df)
     combine_power_consumption(df)
     df_time = clean_time_sync(df)
