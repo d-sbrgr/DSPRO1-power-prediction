@@ -1,4 +1,4 @@
-artifact_uri: file:C:\Users\michi\PycharmProjects\DSPRO1-power-prediction/Models/mlruns/0/b7b99b9d98b940ceaaa4e1bd1ccd91bb/artifacts
+artifact_uri: file:./models/mlruns/0/b7b99b9d98b940ceaaa4e1bd1ccd91bb/artifacts
 end_time: 1731620303668
 entry_point_name: ''
 experiment_id: '0'

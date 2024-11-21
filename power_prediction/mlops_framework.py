@@ -2,7 +2,10 @@ import mlflow
 import mlflow.sklearn
 from mlflow.models.signature import infer_signature
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score, mean_absolute_percentage_error
-from power_prediction.util import get_project_root
+
+
+def set_tracking_uri():
+    mlflow.set_tracking_uri(f"file:./models/mlruns")
 
 
 def save_model(model_name, model, X_test, y_test, y_pred, param_dict, model_type="sklearn"):
@@ -20,10 +23,7 @@ def save_model(model_name, model, X_test, y_test, y_pred, param_dict, model_type
         model_type (str): Type of model, e.g., "sklearn", "xgboost", "lightgbm", "keras", "pytorch".
                           Default is "sklearn".
     """
-
-    # Set tracking URI to the local directory
-    project_root = get_project_root()
-    mlflow.set_tracking_uri(f"file:{project_root}/Models/mlruns")
+    set_tracking_uri()
 
     # Set signature
     signature = infer_signature(X_test, y_test)
@@ -75,17 +75,17 @@ def save_model(model_name, model, X_test, y_test, y_pred, param_dict, model_type
 
 def get_model(model_name, model_version):
     """Returns the trained model as saved"""
-    project_root = get_project_root()
-    mlflow.set_tracking_uri(f"file:{project_root}/Models/mlruns")
-    model_uri = f"models:/{model_name}/{model_version}"
-    return mlflow.pyfunc.load_model(model_uri)
+    set_tracking_uri()
+    try:
+        model_uri = f"models:/{model_name}/{model_version}"
+        return mlflow.pyfunc.load_model(model_uri)
+    except Exception as e:
+        raise RuntimeError(f"Unable to load model: {e}")
 
 
 def print_all_models():
     """Prints all registered models in the MLflow Model Registry along with their versions, parameters, and metrics."""
-
-    project_root = get_project_root()
-    mlflow.set_tracking_uri(f"file:{project_root}/Models/mlruns")
+    set_tracking_uri()
     client = mlflow.tracking.MlflowClient()
     models = client.search_registered_models()
 
@@ -97,13 +97,10 @@ def print_all_models():
             print(f"  Version: {version.version}")
             run_info = client.get_run(version.run_id)
             print(f"    Run ID: {version.run_id}")
-
             print("    Parameters:")
             for param_name, param_value in run_info.data.params.items():
                 print(f"      {param_name}: {param_value}")
-
             print("    Metrics:")
             for metric_name, metric_value in run_info.data.metrics.items():
                 print(f"      {metric_name}: {metric_value}")
-
             print("-" * 50)
