@@ -1,0 +1,29 @@
+artifact_path: model
+flavors:
+  python_function:
+    env:
+      conda: conda.yaml
+      virtualenv: python_env.yaml
+    loader_module: mlflow.sklearn
+    model_path: model.pkl
+    predict_fn: predict
+    python_version: 3.12.6
+  sklearn:
+    code: null
+    pickled_model: model.pkl
+    serialization_format: cloudpickle
+    sklearn_version: 1.5.2
+mlflow_version: 2.17.2
+model_size_bytes: 726
+model_uuid: 031b5acf0e6246f6ac4fa1a7a399aaa3
+run_id: b7b99b9d98b940ceaaa4e1bd1ccd91bb
+signature:
+  inputs: '[{"type": "double", "name": "Hr [%Hr]", "required": true}, {"type": "double",
+    "name": "RainDur [min]", "required": true}, {"type": "double", "name": "StrGlo
+    [W/m2]", "required": true}, {"type": "double", "name": "T [\u00b0C]", "required":
+    true}, {"type": "double", "name": "WD [\u00b0]", "required": true}, {"type": "double",
+    "name": "WVs [m/s]", "required": true}, {"type": "double", "name": "WVv [m/s]",
+    "required": true}, {"type": "double", "name": "p [hPa]", "required": true}]'
+  outputs: '[{"type": "double", "name": "NE5_remainder", "required": true}]'
+  params: null
+utc_time_created: '2024-11-14 21:38:17.619191'

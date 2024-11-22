@@ -1,0 +1,15 @@
+artifact_uri: file:./models/mlruns/0/60528c123aa9418fa7ba8cb826a01ded/artifacts
+end_time: 1731620322226
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: 60528c123aa9418fa7ba8cb826a01ded
+run_name: painted-cod-71
+run_uuid: 60528c123aa9418fa7ba8cb826a01ded
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1731620316015
+status: 3
+tags: []
+user_id: michi
