@@ -1,0 +1,29 @@
+artifact_path: model
+flavors:
+  python_function:
+    data: model.xgb
+    env:
+      conda: conda.yaml
+      virtualenv: python_env.yaml
+    loader_module: mlflow.xgboost
+    python_version: 3.12.6
+  xgboost:
+    code: null
+    data: model.xgb
+    model_class: xgboost.sklearn.XGBRFRegressor
+    model_format: xgb
+    xgb_version: 2.1.2
+mlflow_version: 2.17.2
+model_size_bytes: 1022351
+model_uuid: a3dc18911b244ddbb5aa0101ccd9d7b8
+run_id: 8e1a30fe1085419d8e213b03157f9cb6
+signature:
+  inputs: '[{"type": "double", "name": "Hr", "required": true}, {"type": "double",
+    "name": "RainDur", "required": true}, {"type": "double", "name": "StrGlo", "required":
+    true}, {"type": "double", "name": "T", "required": true}, {"type": "double", "name":
+    "WD", "required": true}, {"type": "double", "name": "WVs", "required": true},
+    {"type": "double", "name": "WVv", "required": true}, {"type": "double", "name":
+    "p", "required": true}]'
+  outputs: '[{"type": "double", "name": "NETOT_remainder", "required": true}]'
+  params: null
+utc_time_created: '2024-11-28 09:56:49.206182'

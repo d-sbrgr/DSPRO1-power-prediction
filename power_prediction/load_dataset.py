@@ -4,7 +4,7 @@ from .preprocess_data import get_data_remove_nan, get_data_retain_nan, get_data_
 
 
 def _load_residuals_data() -> pd.DataFrame:
-    df = pd.read_csv(get_project_root() / 'data' / 'time_decomposition_remainder_data.csv')
+    df = pd.read_parquet(get_project_root() / 'data' / 'time_decomposition_remainder_data.parquet', engine='pyarrow')
     df = _drop_residual_and_yhat_na(df)
     return df
 

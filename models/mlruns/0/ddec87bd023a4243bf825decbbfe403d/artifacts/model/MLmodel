@@ -1,0 +1,34 @@
+artifact_path: model
+flavors:
+  python_function:
+    data: model.xgb
+    env:
+      conda: conda.yaml
+      virtualenv: python_env.yaml
+    loader_module: mlflow.xgboost
+    python_version: 3.12.6
+  xgboost:
+    code: null
+    data: model.xgb
+    model_class: xgboost.sklearn.XGBRFRegressor
+    model_format: xgb
+    xgb_version: 2.1.2
+mlflow_version: 2.17.2
+model_size_bytes: 6312338
+model_uuid: 310f2a02cfae442cb37679a58a2f0a9e
+run_id: ddec87bd023a4243bf825decbbfe403d
+signature:
+  inputs: '[{"type": "double", "name": "Hr", "required": true}, {"type": "double",
+    "name": "RainDur", "required": true}, {"type": "double", "name": "StrGlo", "required":
+    true}, {"type": "double", "name": "T", "required": true}, {"type": "double", "name":
+    "WD", "required": true}, {"type": "double", "name": "WVs", "required": true},
+    {"type": "double", "name": "WVv", "required": true}, {"type": "double", "name":
+    "p", "required": true}, {"type": "double", "name": "Vacation", "required": true},
+    {"type": "double", "name": "Holiday", "required": true}, {"type": "long", "name":
+    "Year", "required": true}, {"type": "long", "name": "Month", "required": true},
+    {"type": "long", "name": "Day", "required": true}, {"type": "long", "name": "Hour",
+    "required": true}, {"type": "long", "name": "Weekday", "required": true}, {"type":
+    "long", "name": "Corona", "required": true}]'
+  outputs: '[{"type": "double", "name": "NE_tot", "required": true}]'
+  params: null
+utc_time_created: '2024-11-28 09:45:59.163273'
