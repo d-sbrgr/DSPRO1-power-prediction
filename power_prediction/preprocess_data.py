@@ -3,6 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 from . import get_project_root
+from .util import df_time_to_utc_plus_one
 
 
 def read_formatted_source_data() -> pd.DataFrame:
@@ -35,14 +36,16 @@ def read_time_decomposition_remainder_data() -> pd.DataFrame:
     return pd.read_parquet(file_path, engine='pyarrow')
 
 
-def convert_date(df) -> None:
+def convert_date(df) -> pd.DataFrame:
     """Converts the date column to datetime format and adds the features Year, Month, Day, Hour and Weekday."""
-    df['Date_format'] = pd.to_datetime(df['Date'])
-    df['Year'] = df['Date_format'].dt.year
-    df['Month'] = df['Date_format'].dt.month
-    df['Day'] = df['Date_format'].dt.day
-    df['Hour'] = df['Date_format'].dt.hour
-    df['Weekday'] = df['Date_format'].dt.weekday + 1
+    df['Date'] = pd.to_datetime(df['Date'])
+    df = df_time_to_utc_plus_one(df)
+    df['Year'] = df['Date'].dt.year
+    df['Month'] = df['Date'].dt.month
+    df['Day'] = df['Date'].dt.day
+    df['Hour'] = df['Date'].dt.hour
+    df['Weekday'] = df['Date'].dt.weekday + 1
+    return df
 
 def combine_power_consumption(df) -> None:
     """Combines the power consumption columns."""
@@ -50,7 +53,7 @@ def combine_power_consumption(df) -> None:
 
 def clean_time_sync(df) -> pd.DataFrame:
     """Removes the last rows with NaN values."""
-    idx_drop = df[(df["NE_tot"].isna()) & (df["Date_format"] >= pd.to_datetime("2024-10-02").tz_localize('UTC'))].index
+    idx_drop = df[(df["NE_tot"].isna()) & (df["Date"] >= pd.to_datetime("2024-10-02"))].index
     df_time = df.drop(idx_drop)
     return df_time
 
@@ -60,8 +63,8 @@ def clean_humidity(df) -> None:
 
 def add_corona_feature(df) -> None:
     """Adds the corona feature."""
-    corona_period_1 = (df['Date_format'] >= '2020-03-18') & (df['Date_format'] <= '2020-06-06')
-    corona_period_2 = (df['Date_format'] >= '2021-01-18') & (df['Date_format'] <= '2021-03-04')
+    corona_period_1 = (df['Date'] >= '2020-03-18') & (df['Date'] <= '2020-06-06')
+    corona_period_2 = (df['Date'] >= '2021-01-18') & (df['Date'] <= '2021-03-04')
     df['Corona'] = (corona_period_1 | corona_period_2).astype(int)
 
 def plot_data(df) -> None:
@@ -150,7 +153,7 @@ def clean_interpolate_nan(df) -> pd.DataFrame:
 def get_data_retain_nan() -> pd.DataFrame:
     """Returns the DataFrame with the cleaning strategy 1."""
     df = read_formatted_source_data()
-    convert_date(df)
+    df = convert_date(df)
     combine_power_consumption(df)
     df_time = clean_time_sync(df)
     clean_humidity(df_time)
@@ -161,7 +164,7 @@ def get_data_retain_nan() -> pd.DataFrame:
 def get_data_remove_nan() -> pd.DataFrame:
     """Returns the DataFrame with the cleaning strategy 2."""
     df = read_formatted_source_data()
-    convert_date(df)
+    df = convert_date(df)
     combine_power_consumption(df)
     df_time = clean_time_sync(df)
     clean_humidity(df_time)
@@ -172,7 +175,7 @@ def get_data_remove_nan() -> pd.DataFrame:
 def get_data_interpolate_nan() -> pd.DataFrame:
     """Returns the DataFrame with the cleaning strategy 3."""
     df = read_formatted_source_data()
-    convert_date(df)
+    df = convert_date(df)
     combine_power_consumption(df)
     df_time = clean_time_sync(df)
     clean_humidity(df_time)
