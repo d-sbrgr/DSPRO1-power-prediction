@@ -1,0 +1,15 @@
+artifact_uri: file:./models/mlruns/0/2dc937a1faad4cda9a0e4511824cf7dc/artifacts
+end_time: 1733487204760
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: 2dc937a1faad4cda9a0e4511824cf7dc
+run_name: casual-eel-882
+run_uuid: 2dc937a1faad4cda9a0e4511824cf7dc
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1733487201089
+status: 3
+tags: []
+user_id: jovyan

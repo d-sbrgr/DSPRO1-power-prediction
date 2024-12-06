@@ -1,5 +1,6 @@
 import mlflow
 import mlflow.sklearn
+import pickle
 from mlflow.models.signature import infer_signature
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score, mean_absolute_percentage_error
 
@@ -64,6 +65,7 @@ def save_model(model_name, model, X_test, y_test, y_pred, param_dict, model_type
         else:
             raise ValueError(f"Model type '{model_type}' is not supported.")
 
+        
         # Register model in the Model Registry
         if model_info:
             try:

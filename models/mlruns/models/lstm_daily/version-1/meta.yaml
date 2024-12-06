@@ -1,0 +1,14 @@
+aliases: []
+creation_timestamp: 1733487204758
+current_stage: None
+description: null
+last_updated_timestamp: 1733487204758
+name: lstm_daily
+run_id: 2dc937a1faad4cda9a0e4511824cf7dc
+run_link: null
+source: file:./models/mlruns/0/2dc937a1faad4cda9a0e4511824cf7dc/artifacts/model
+status: READY
+status_message: null
+storage_location: file:./models/mlruns/0/2dc937a1faad4cda9a0e4511824cf7dc/artifacts/model
+user_id: null
+version: 1
