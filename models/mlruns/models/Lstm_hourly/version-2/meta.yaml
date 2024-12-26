@@ -1,0 +1,14 @@
+aliases: []
+creation_timestamp: 1735204390111
+current_stage: None
+description: null
+last_updated_timestamp: 1735204390111
+name: Lstm_hourly
+run_id: 6aee9cd86c7e4fb0b26b6ff2b43baa71
+run_link: null
+source: file:./models/mlruns/0/6aee9cd86c7e4fb0b26b6ff2b43baa71/artifacts/model
+status: READY
+status_message: null
+storage_location: file:./models/mlruns/0/6aee9cd86c7e4fb0b26b6ff2b43baa71/artifacts/model
+user_id: null
+version: 2

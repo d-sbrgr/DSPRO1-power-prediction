@@ -1,0 +1,15 @@
+artifact_uri: file:./models/mlruns/0/6aee9cd86c7e4fb0b26b6ff2b43baa71/artifacts
+end_time: 1735204390114
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: 6aee9cd86c7e4fb0b26b6ff2b43baa71
+run_name: skillful-mink-877
+run_uuid: 6aee9cd86c7e4fb0b26b6ff2b43baa71
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1735204385324
+status: 3
+tags: []
+user_id: jovyan
