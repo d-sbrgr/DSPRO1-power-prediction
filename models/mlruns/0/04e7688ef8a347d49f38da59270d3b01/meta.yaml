@@ -1,0 +1,15 @@
+artifact_uri: file:./models/mlruns/0/04e7688ef8a347d49f38da59270d3b01/artifacts
+end_time: 1735206186997
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: 04e7688ef8a347d49f38da59270d3b01
+run_name: debonair-deer-103
+run_uuid: 04e7688ef8a347d49f38da59270d3b01
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1735206182084
+status: 3
+tags: []
+user_id: jovyan
