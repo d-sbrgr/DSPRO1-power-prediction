@@ -50,4 +50,13 @@ def plot_target_and_predictions(dates: pd.DatetimeIndex, target: pd.Series, pred
     plt.xlabel(x_label)
     plt.ylabel(y_label)
     plt.legend()
+    plt.savefig(title.lower().replace(":", "_").replace(" ", "_") + ".png", bbox_inches='tight')
     plt.show()
+
+
+def plot_month_extraction(dates: pd.Series, target: pd.Series, pred: pd.Series, title: str, unit: str, month: int):
+    import pandas as pd
+    df_plot = pd.DataFrame({"Date": dates, "Target": target, "Pred": pred})
+    df_nov = df_plot[df_plot.Date.dt.month == month]
+    plot_target_and_predictions(df_nov.Date, df_nov.Target, df_nov.Pred, title, "Date",
+                                f"Power Consumption [{unit}]")
